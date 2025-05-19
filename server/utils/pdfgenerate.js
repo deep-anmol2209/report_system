@@ -1,9 +1,20 @@
 import puppeteer from 'puppeteer';
 import Issue from '../model/issueModel.js';
+import mongoose from 'mongoose';
+import { dotenvVar } from '../config.js';
 import fs from 'fs';
 import path from 'path';
 
 export async function generatePDF(filters = {}) {
+
+  mongoose.connect(dotenvVar.MONGODB_URI) // Use `process.env` for dotenv variables
+    .then(() =>
+        { 
+            console.log("Connected to DB")
+             
+        }) // Arrow function to properly handle the resolved promise
+    .catch(err => console.error("Database connection error:", err)); // Proper `.catch()` handling
+
   const { engineerId, projectId, plazaId, startDate, endDate } = filters;
  let query={};
     if (engineerId) {
