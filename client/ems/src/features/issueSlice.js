@@ -1,3 +1,4 @@
+
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import Project from "../../../../server/model/projectModel";
@@ -129,6 +130,30 @@ export const getIssuesByProjectId = createAsyncThunk("issues/getIssuesByProjectI
   }
 )
 
+export const updateIssue = createAsyncThunk("issues/getIssuesByProjectId",
+  async (payload, { rejectWithValue, getState }) => {
+
+    try {
+      const token = getState().auth.token;
+      const response = await axios.put(`https://mepl-erp.co.in/api/superadmin/updateIssue,payload`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log(response);
+
+      return response.data.issues; // Return updated issue
+    } catch (error) {
+      console.log(error);
+
+      return rejectWithValue(error.response.data);
+    }
+
+  }
+)
+
+
+
 
 
 // Issue slice
@@ -230,4 +255,4 @@ const issueSlice = createSlice({
 });
 
 export const { resetStatus } = issueSlice.actions;
-export default issueSlice.reducer;
+export default issueSlice.reducer

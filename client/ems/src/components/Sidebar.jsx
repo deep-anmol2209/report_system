@@ -1,26 +1,42 @@
-import { useState } from "react";
-import { FaBars, FaChevronDown, FaChevronUp, FaTachometerAlt, FaProjectDiagram, FaUserShield, FaUsers, FaBug, FaHardHat, FaLandmark , FaTimes} from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaBars, FaChevronDown, FaChevronUp, FaTachometerAlt, FaProjectDiagram, FaUserShield, FaUsers, FaBug, FaHardHat, FaLandmark, FaTimes } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
-  const { role, isEngineerAlso} = useSelector((state) => state.auth);
+  const [isMobile, setIsMobile] = useState(false);
+  const { role, isEngineerAlso } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setIsOpen(false);
+      }
+    };
+
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
     setOpenMenu(null);
   };
+
   const toggleSubmenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
-console.log(role);
 
   const roleBasedMenu = {
     SuperAdmin: ["Dashboard", "Projects", "Project Incharge", "Admin", "Issue", "Site Engineers", "Plaza"],
-    Admin: ["Dashboard", "Projects", "Admin", "Project Incharge", "Issue", "Site Engineers", "Plaza"],
+    Admin: ["Dashboard", "Projects", "Admin", "Project Incharge", "Issue", "Site Engineers", "Plaza", "Generate Report", "Admin-Attendance"],
     project_incharge: ["Dashboard", "Projects", "Issue"],
-    site_engineer: ["Dashboard", "Issue", "Track Issue"],
+    site_engineer: ["Dashboard", "Issue", "Track Issue", "Attendance"],
     plaza_incharge: ["Dashboard", "Issue", "Plaza Issues"]
   };
 
@@ -33,14 +49,15 @@ console.log(role);
         { name: "All Projects", path: "/all-projects" },
         { name: "Add Project", path: "/add-project" },
         { name: "Manage Projects", path: "/manage-projects" },
-        {name: "My project", path: "/get-projectById"}
+        { name: "My project", path: "/get-projectById" }
       ].filter(subItem => {
-        if (role === "project_incharge" ) {
-          return subItem.name === "My project" ;
+        if (role === "project_incharge") {
+          return subItem.name === "My project";
         }
-        if(role === "Admin"){
-          return subItem.name === "Add Project" || subItem.name==="Manage Projects"
+        if (role === "Admin") {
+          return subItem.name === "Add Project" || subItem.name === "Manage Projects";
         }
+        return false;
       })
     },
     {
@@ -50,6 +67,11 @@ console.log(role);
         { name: "Add Incharge", path: "/add-incharge" },
         { name: "Manage Incharges", path: "/manage-incharge" },
       ],
+    },
+    {
+      title: "Generate Report",
+      icon: <FaUserShield />,
+      path: "/generate-report"
     },
     {
       title: "Admin",
@@ -65,33 +87,29 @@ console.log(role);
       icon: <FaBug />,
       subItems: [
         { name: "Create Issue", path: "/issue-generate" },
-        { name: "Track Issue", path: role=== "project_incharge"?"/manage-ProjectIssues": "/all-issuesById" },
+        { name: "Track Issue", path: role === "project_incharge" ? "/manage-ProjectIssues" : "/all-issuesById" },
         { name: "Manage Issue", path: "/manage-issue" },
-        {name: "All Issues", path: '/all-issues'},
-        {name: "Project Issues" , path: '/all-issues'},
-        {name: "Plaza Issues", path: "/all-issuesById"}
+        { name: "All Issues", path: '/all-issues' },
+        { name: "Project Issues", path: '/all-issues' },
+        { name: "Plaza Issues", path: "/all-issuesById" }
       ].filter(subItem => {
         if (role === "SuperAdmin" || role === "Admin") {
-          return subItem.name === "Manage Issue" || subItem.name=== "All Issues";
+          return subItem.name === "Manage Issue" || subItem.name === "All Issues";
         }
         if (role === "site_engineer") {
           return subItem.name === "Create Issue" || subItem.name === "Track Issue";
         }
-
-        if(role=== "plaza_incharge"){
-          return subItem.name === "Plaza Issues" || subItem.name=== "Create Issue" || subItem.name=== "All Issues"
+        if (role === "plaza_incharge") {
+          return subItem.name === "Plaza Issues" || subItem.name === "Create Issue" || subItem.name === "All Issues";
         }
         if (role === "project_incharge") {
-          if(isEngineerAlso=== true){
-            return subItem.name === "Create Issue" || subItem.name === "Track Issue" || subItem.name== "Project Issues" ;
+          if (isEngineerAlso === true) {
+            return subItem.name === "Create Issue" || subItem.name === "Track Issue" || subItem.name === "Project Issues";
           }
-          else{
-            return subItem.name === "Project Issues" || subItem.name=== "Track Issue";
+          else {
+            return subItem.name === "Project Issues" || subItem.name === "Track Issue";
           }
-         
-          
         }
-        
         return false;
       }),
     },
@@ -102,6 +120,19 @@ console.log(role);
         { name: "Add Site Engineers", path: "/add-engineer" },
         { name: "All Engineers", path: "/all-engineers" },
         { name: "Manage Engineers", path: "/manage-engineers" },
+      ],
+    },
+    {
+      title: "Admin-Attendance",
+      icon: <FaHardHat />,
+      path: "/adminattendence"
+    },
+    {
+      title: "Attendance",
+      icon: <FaHardHat />,
+      subItems: [
+        { name: "Mark Attendance", path: "/attendence" },
+        { name: "Attendance history", path: "/attendancehistory" }
       ],
     },
     {
@@ -117,54 +148,85 @@ console.log(role);
   const filteredMenuItems = menuItems.filter((item) => roleBasedMenu[role]?.includes(item.title));
 
   return (
-    <div className="flex">
-      <div className={`bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen p-5 transition-all duration-300 shadow-xl ${isOpen ? "w-72" : "w-20"}`}>
-        <button onClick={toggleSidebar} className="text-white focus:outline-none mb-6 flex items-center">
-          <FaBars size={28} className="mr-2" />
-          {isOpen && <span className="text-lg font-semibold">Menu</span>}
-        </button>
+    <>
+      {/* Mobile overlay and toggle */}
+      {isMobile && isOpen && (
+        <div 
+          className="fixed top-0 inset-0  bg-opacity-50 z-30"
+          onClick={toggleSidebar}
+        />
+      )}
 
-        <ul className="space-y-3">
-          {filteredMenuItems.map((item, index) => (
-            <li key={index} className="group">
-              {item.subItems ? (
-                <>
-                  <button
-                    onClick={() => toggleSubmenu(item.title)}
-                    className="flex items-center justify-between w-full px-4 py-3 text-left bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300 shadow-md"
+      <div className={`fixed top-0 z-40 bg-gray-900 text-white h-full transition-all duration-300
+        ${isOpen ? "w-55" : "w-15"} shadow-xl`}>
+        
+        {/* Header with toggle button */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+          {isOpen && (
+            <h2 className="text-xl font-semibold">Menu</h2>
+          )}
+          <button 
+            onClick={toggleSidebar}
+            className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-gray-700"
+          >
+            {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+          </button>
+        </div>
+
+        {/* Menu items */}
+        <div className="overflow-y-auto h-[calc(100vh-64px)]">
+          <ul className="space-y-1 p-2">
+            {filteredMenuItems.map((item, index) => (
+              <li key={index}>
+                {item.subItems ? (
+                  <>
+                    <button
+                      onClick={() => toggleSubmenu(item.title)}
+                      className={`flex items-center w-full p-3 rounded-lg hover:bg-gray-800 transition-colors
+                        ${openMenu === item.title ? 'bg-gray-800' : ''}`}
+                    >
+                      <span className="text-lg">{item.icon}</span>
+                      {isOpen && (
+                        <>
+                          <span className="ml-3 flex-1 text-left">{item.title}</span>
+                          {openMenu === item.title ? <FaChevronUp /> : <FaChevronDown />}
+                        </>
+                      )}
+                    </button>
+
+                    {openMenu === item.title && isOpen && (
+                      <ul className="ml-8 mt-1 space-y-1">
+                        {item.subItems.map((subItem, subIndex) => (
+                          <li key={subIndex}>
+                            <Link
+                              to={subItem.path}
+                              className="block p-2 pl-6 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white"
+                              onClick={() => isMobile && toggleSidebar()}
+                            >
+                              {subItem.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    to={item.path}
+                    className="flex items-center p-3 rounded-lg hover:bg-gray-800"
+                    onClick={() => isMobile && toggleSidebar()}
                   >
-                    <span className="flex items-center">
-                      {item.icon} {isOpen && <span className="ml-3 text-base font-medium">{item.title}</span>}
-                    </span>
-                    {isOpen && (openMenu === item.title ? <FaChevronUp /> : <FaChevronDown />)}
-                  </button>
-
-                  {openMenu === item.title && (
-                    <ul className="pl-6 mt-2 space-y-2 border-l-2 border-gray-500 ml-4">
-                      {item.subItems.map((subItem, subIndex) => (
-                        <li key={subIndex} className="bg-gray-800 p-2 rounded-md hover:bg-gray-700 transition duration-300">
-                          <Link to={subItem.path} className="text-sm text-gray-300 hover:text-white block">
-                            {subItem.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              ) : (
-                <Link
-                  to={item.path}
-                  className="flex items-center px-4 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition duration-300 shadow-md"
-                >
-                  {item.icon}{isOpen && <span className="ml-3">{item.title}</span>}
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
+                    <span className="text-lg">{item.icon}</span>
+                    {isOpen && <span className="ml-3">{item.title}</span>}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
+    </>
   );
-  };
+};
 
 export default Sidebar;

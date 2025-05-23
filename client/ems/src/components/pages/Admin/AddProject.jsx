@@ -70,7 +70,7 @@ const AddProject = () => {
             { label: "PIU Name", name: "PIU_Name", icon: <FaBuilding /> },
             { label: "Location", name: "location", icon: <FaMapMarkerAlt /> }
           ].map(({ label, name, icon }) => (
-            <div key={name} className="relative">
+            <div key={name} className="block">
               <label className="block text-gray-700 text-sm font-medium mb-1">
                 {label}
               </label>
@@ -81,7 +81,7 @@ const AddProject = () => {
                   name={name}
                   value={formData[name]}
                   onChange={handleChange}
-                  className="w-full p-3 border-0 focus:ring-0 focus:outline-none"
+                  className="w-full p-4 border-0 focus:ring-0 focus:outline-none"
                   required
                 />
               </div>

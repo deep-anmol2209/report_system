@@ -7,6 +7,8 @@ import projectInchargeReducer from "../features/projectInchargeSlice";
 import prijectReducer from "../features/projectSlice";
 import issueReducer from "../features/issueSlice";
 import countReducer from "../features/countSlice"
+import attedenceReducer from "../features/attendenceSlice"
+import userReducres from "../features/userSlice"
 
 // 1. Combine all reducers
 const appReducer = combineReducers({
@@ -18,6 +20,8 @@ const appReducer = combineReducers({
   project: prijectReducer,
   issue: issueReducer,
   counts: countReducer,
+  attendance: attedenceReducer,
+  users: userReducres
 });
 
 // 2. Root reducer that listens for logout

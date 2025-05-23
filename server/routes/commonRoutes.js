@@ -44,6 +44,7 @@ router.post("/add-issue", authenticateToken , engineerController.addIssue );
 router.get("/get-allPendingIssues", authenticateToken, engineerController.getAllPendingIssues);
 router.get("/get-allPendingIssuesById", authenticateToken, engineerController.getAllIssuesById)
 router.get('/get-allIssues',authenticateToken, engineerController.getAllIssues);
+router.put("/updateIssue", authenticateToken, adminCtrl.updateIssue)
 router.get("/get-projectIssues/:projectId", authenticateToken, proejctinchargeController.getIssuesByProjectId)
 router.post('/resolve-issue', authenticateToken, adminCtrl.resolveIssue)
 router.get('/get-issuesByPlazaId', authenticateToken, engineerController.getIssuesByPlazaId)
@@ -53,10 +54,12 @@ router.get('/get-issuesByPlazaId', authenticateToken, engineerController.getIssu
 
 //add siteEngineer , delete ,update 
 router.post("/add-engineer", authenticateToken, adminCtrl.createUser);
-router.get("/get-allSiteEngineers", authenticateToken, proejctinchargeController.getSiteEngineers);
+router.get("/get-allSiteEngineers", authenticateToken, proejctinchargeController.getAllUsers);
 router.post("/get-nameById", authenticateToken, proejctinchargeController.getEngineersNamesByIds);
-router.delete("/delete-engineer/:username", authenticateToken, proejctinchargeController.deleteSiteEngineer)
-router.get('/get-activeEngineers', authenticateToken, proejctinchargeController.getActiveEnginrres)
+router.delete("/delete-user/:username", authenticateToken, proejctinchargeController.deleteUser)
+router.put('/update-user/:id', authenticateToken, proejctinchargeController.updateUser)
+router.get('/get-activeEngineers', authenticateToken, proejctinchargeController.getActiveUsers)
+router.get('/allusers', authenticateToken, adminCtrl.getAllusers)
 
 
 

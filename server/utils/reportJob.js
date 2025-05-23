@@ -2,6 +2,10 @@ import { dotenvVar } from "../config.js";
 import nodemailer from "nodemailer"
 import mongoose from 'mongoose';
 import { generatePDF } from "./pdfgenerate.js";
+
+
+
+
  async function sendEmail(pdfBuffer) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -30,6 +34,13 @@ import { generatePDF } from "./pdfgenerate.js";
   
   async function runJob() {
     try {
+        console.log("hello");
+        try{
+       await  mongoose.connect(dotenvVar.MONGODB_URI) // Use `process.env` for dotenv variables
+        }catch(err){
+            console.log(err);
+            
+        }
       const pdfBuffer = await generatePDF();
       await sendEmail(pdfBuffer);
       console.log('Email sent with PDF attachment.');

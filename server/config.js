@@ -8,8 +8,6 @@ import authEssentials from "./controller/index.js";
 
 const dotenvVar= {
     PORT: process.env.PORT,
-    USER_MAILER: process.env.USER_MAILER,
-    PASS_MAILER: process.env.PASS_MAILER,
     JWT_SECRET: process.env.JWT_SECRET,
     MONGODB_URI: process.env.MONGODB_URI,
     SALT: process.env.SALT,
@@ -22,8 +20,8 @@ const dotenvVar= {
 
 const init= async ()=>{
     try{
-        const admin= await SuperAdmin.findOne({role: "Admin"});
-        if(admin){
+        const admin= await SuperAdmin.find();
+        if(admin.length>0){
             console.log('SuperAdmin already exist');
          return            
         }

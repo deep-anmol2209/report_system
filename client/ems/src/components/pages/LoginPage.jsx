@@ -9,6 +9,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
+  const logo = "/bg.png";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,8 +23,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="bg-gray-100 flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-sm bg-white p-8 rounded-lg shadow-md">
+    
+    <div className="bg-cover bg-center bg-no-repeat flex items-center justify-center min-h-screen  " style={{ backgroundImage: "url('/bg.png')" }}>
+      
+      
+
+      <div className="w-full max-w-sm bg-white/30 backdrop-blur-md border border-white/40 p-8 rounded-lg shadow-md ">
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -34,7 +39,7 @@ const LoginPage = () => {
             <input
               type="text"
               id="username"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-hidden "
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -46,7 +51,7 @@ const LoginPage = () => {
             <input
               type="password"
               id="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-hidden "
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

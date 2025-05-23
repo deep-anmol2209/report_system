@@ -1,22 +1,29 @@
 import Header from "../Header";
 import Sidebar from "../Sidebar";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-const Layout = () => {
-  return (
-    <div className="flex h-screen ">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <main className="p-6 bg-gray-100 flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-auto">
-    <Outlet />
-  </div>
 
+
+const Layout = () => {
+    const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className="flex flex-col sm:flex-row h-screen">
+      {/* Sidebar - hidden on mobile, shown on sm and above */}
+      <Sidebar />
+      
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header />
+        
+        <main className={`flex-1 transition-all duration-300 ease-in-out ${isOpen ? 'ml-[100px]' : 'ml-[72px]'}`}>
+          <div className=" w-full max-w-full overflow-hidden sm:max-w-6xl mx-auto ">
+            <Outlet className="p-4"/>
+          </div>
         </main>
       </div>
     </div>
   );
 };
 
-export default Layout;
+export default Layout

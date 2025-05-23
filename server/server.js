@@ -4,6 +4,7 @@ import cors from "cors"
 import {dotenvVar, init} from "./config.js"
 import authRoutes from "./routes/authRoutes.js"
 import commonRoutes from "./routes/commonRoutes.js"
+import attendenceRoutes from "./routes/attendenceRoute.js"
 import cookieParser from "cookie-parser"
 const app= express()
 app.use(cookieParser())
@@ -30,7 +31,8 @@ const allowedOrigins = [
   );
 
 app.use('/api/user', authRoutes);
-app.use('/api/superadmin', commonRoutes)
+app.use('/superadmin', commonRoutes);
+app.use('/api/attendence', attendenceRoutes)
 
 
 

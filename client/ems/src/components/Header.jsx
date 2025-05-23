@@ -17,7 +17,7 @@ function Header() {
   const logo = "/logo2.png";
 
   return (
-    <header className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 sm:px-6 py-3 shadow-md relative">
+    <header className="bg-gradient-to-r from-gray-900 to-gray-800 fixed top-0 text-white px-2 sm:px-6 py-3 shadow-md relative">
       <div className="flex justify-between items-center max-w-7xl mx-auto">
         {/* Logo - Responsive sizing */}
         <img
@@ -27,7 +27,7 @@ function Header() {
         />
 
         {/* Mobile Menu Button - Only shows on small screens */}
-        <div className="md:hidden">
+        <div className="md:hidden ">
           <button 
             onClick={() => setIsOpen(!isOpen)} 
             className="text-white p-2 rounded-md hover:bg-gray-700 transition"
@@ -38,7 +38,7 @@ function Header() {
         </div>
 
         {/* Desktop Menu - Shows on medium screens and up */}
-        <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
+        <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 z-1">
           <button 
             className="flex items-center gap-1 lg:gap-2 hover:text-yellow-400 transition duration-300 px-2 py-1 rounded"
             aria-label="Settings"
@@ -76,7 +76,7 @@ function Header() {
 
       {/* Mobile Menu Dropdown - Only shows on small screens when toggled */}
       {isOpen && (
-        <div className="absolute top-full right-0 z-50 bg-gray-800 text-white shadow-lg rounded-b-lg py-3 px-4 w-full md:hidden">
+        <div className="absolute top-full right-0 z-100 bg-gray-800 text-white shadow-lg rounded-b-lg py-3 px-4 w-full md:hidden">
           <div className="flex flex-col space-y-3">
             <button 
               className="flex items-center gap-3 hover:text-yellow-400 transition duration-300 px-3 py-2 rounded-md hover:bg-gray-700"

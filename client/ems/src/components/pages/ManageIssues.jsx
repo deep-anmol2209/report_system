@@ -42,8 +42,8 @@ export default function ManageIssues() {
         {status === "loading" && <p className="text-center text-blue-600">Loading issues...</p>}
         {error && <p className="text-center text-red-600">{error}</p>}
 
-        <div className="overflow-x-auto">
-          <table className="w-full border border-gray-300 rounded-lg overflow-hidden">
+        <div className=" h-full w-full overflow-auto">
+          <table className="w-full min-w-max table-auto border border-gray-300 rounded-lg ">
             <thead className="bg-blue-600 text-white">
               <tr>
                 <th className="p-3 text-left">Sr No</th>

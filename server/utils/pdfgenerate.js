@@ -1,20 +1,12 @@
 import puppeteer from 'puppeteer';
 import Issue from '../model/issueModel.js';
-import mongoose from 'mongoose';
-import { dotenvVar } from '../config.js';
+import attendenceModel from '../model/attendenceMOdel.js';
+import Project from '../model/projectModel.js';
 import fs from 'fs';
 import path from 'path';
 
 export async function generatePDF(filters = {}) {
-
-  mongoose.connect(dotenvVar.MONGODB_URI) // Use `process.env` for dotenv variables
-    .then(() =>
-        { 
-            console.log("Connected to DB")
-             
-        }) // Arrow function to properly handle the resolved promise
-    .catch(err => console.error("Database connection error:", err)); // Proper `.catch()` handling
-
+  let flag= 0;
   const { engineerId, projectId, plazaId, startDate, endDate } = filters;
  let query={};
     if (engineerId) {
@@ -25,7 +17,33 @@ export async function generatePDF(filters = {}) {
     }
   
     if (projectId) {
-      query['plazaId'] = projectId;  // Filter by plazaId (assuming it's project related)
+      try {
+        flag=1;
+        // Fetch project and its plaza IDs
+        const project = await Project.findById(projectId).populate("plazas", "_id");
+    
+        if (!project) {
+          console.log("no projectFound");
+          
+          // return res.status(404).json({ message: "Project not found" });
+        }
+    
+        const plazaIds = project.plazas.map(plaza => plaza._id);
+    
+        // Find only pending issues from those plazas
+        var ProjectIssues = await Issue.find({
+          plazaId: { $in: plazaIds },
+          
+        }).populate("reportedBy", "username").populate('plazaId').populate("rectifiedBy")
+    
+        // return res.status(200).json({
+        //   message: "Pending issues fetched successfully",
+        //   issues,
+        // });
+      } catch (error) {
+        console.error("Error fetching issues:", error);
+        // return res.status(500).json({ message: "Server error", error });
+      }
     }
   
     if (plazaId) {
@@ -35,8 +53,9 @@ export async function generatePDF(filters = {}) {
     }
   
     if (startDate && endDate) {
-      query['issueTime'] = { $gte: new Date(startDate), $lte: new Date(endDate) };  // Filter by date range
+      query['issueTime'] = { $gte: new Date(startDate), $lte: new Date(endDate) };
     }
+    
   
     // Fetch filtered issues
     console.log(query);
@@ -47,7 +66,7 @@ export async function generatePDF(filters = {}) {
       .populate('plazaId');
   
     console.log("Fetched Issues:", issues.length);
-  const tableRows = issues.map(issue => {
+  const tableRows = flag===0? (issues.map(issue => {
     const reportedBy = issue.reportedBy ? `${issue.reportedBy.firstName} ${issue.reportedBy.lastName}` : 'N/A';
     const rectifiedBy = issue.rectifiedBy ? `${issue.rectifiedBy.firstName} ${issue.rectifiedBy.lastName}` : 'N/A';
     const plazaName = issue.plazaId?.plazaName || 'N/A';
@@ -65,7 +84,29 @@ export async function generatePDF(filters = {}) {
         <td>${issue.rectifiedTime?.toLocaleString() || 'N/A'}</td>
       </tr>
     `;
-  }).join('');
+  }).join('')) :(
+    ProjectIssues.map(issue => {
+      console.log(issue);
+      
+      const reportedBy = issue.reportedBy ? `${issue.reportedBy.username}` : 'N/A';
+      const rectifiedBy = issue.rectifiedBy ? `${issue.rectifiedBy.firstName} ${issue.rectifiedBy.lastName}` : 'N/A';
+      const plazaName = issue.plazaId?.plazaName || 'N/A';
+  
+      return `
+        <tr>
+          <td>${issue.issueId}</td>
+          <td>${issue.problemType}</td>
+          <td>${reportedBy}</td>
+          <td>${issue.description}</td>
+          <td>${plazaName}</td>
+          <td>${issue.issueTime?.toLocaleString() || 'N/A'}</td>
+          <td>${issue.remarks}</td>
+          <td>${rectifiedBy}</td>
+          <td>${issue.rectifiedTime?.toLocaleString() || 'N/A'}</td>
+        </tr>
+      `;
+    }).join(''))
+  
 
   const html = `
     <html>
@@ -136,3 +177,123 @@ export async function generatePDF(filters = {}) {
     throw err;
   }
 }
+
+
+
+
+
+export const genAttendancePdf = async (filters = {}) => {
+  try {
+    // Build the query
+    const query = {};
+
+    // Filter by user ID
+    if (filters.userId) {
+      query.user = filters.userId;
+    }
+
+    // Filter by date range
+    if (filters.startDate || filters.endDate) {
+      query.date = {};
+      if (filters.startDate) query.date.$gte = new Date(filters.startDate);
+      if (filters.endDate) query.date.$lte = new Date(filters.endDate);
+    }
+
+    const attendanceRecords = await attendenceModel.find(query).populate('user').lean();
+console.log(attendanceRecords);
+
+const htmlContent = `
+<html>
+  <head>
+    <style>
+      body { font-family: Arial; padding: 20px; }
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+      th { background-color: #f2f2f2; }
+      .status-present { color: green; font-weight: bold; }
+      .status-absent { color: red; font-weight: bold; }
+      .status-leave { color: orange; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h2>Attendance Report</h2>
+    <table>
+      <tr>
+        <th>Employee Name</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+      ${attendanceRecords.map(record => {
+        const statusClass = record.status === 'present'
+          ? 'status-present'
+          : record.status === 'absent'
+          ? 'status-absent'
+          : 'status-leave';
+        return `
+          <tr>
+            <td>${record.user?.firstName || ''} ${record.user?.lastName || ''}</td>
+            <td>${record.user?.email || ''}</td>
+            <td class="${statusClass}">${record.status}</td>
+            <td>${new Date(record.date).toLocaleDateString()}</td>
+          </tr>
+        `;
+      }).join("")}
+    </table>
+  </body>
+</html>
+`;
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+    await browser.close();
+
+    return pdfBuffer;
+
+  } catch (err) {
+    console.error("Error generating PDF:", err);
+    throw err;
+  }
+};
+
+export const generateProjectWisePdf= async()=>{
+
+    const { projectId } = req.body;
+
+  
+    if (!projectId) {
+      return res.status(400).json({ message: "Project ID is not a valid" });
+    }
+  
+    try {
+      // Fetch project and its plaza IDs
+      const project = await Project.findById(projectId).populate("plazas", "_id");
+  
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+  
+      const plazaIds = project.plazas.map(plaza => plaza._id);
+  
+      // Find only pending issues from those plazas
+      const issues = await Issue.find({
+        plazaId: { $in: plazaIds },
+        
+      }).populate("reportedBy", "username").populate('plazaId').populate("rectifiedBy")
+  
+      return res.status(200).json({
+        message: "Pending issues fetched successfully",
+        issues,
+      });
+    } catch (error) {
+      console.error("Error fetching issues:", error);
+      return res.status(500).json({ message: "Server error", error });
+    }
+  }
+  

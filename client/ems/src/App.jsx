@@ -32,6 +32,11 @@ import AllProjectIssues from "./components/pages/AllProjectIssues.jsx";
 import UnderDevelopment from "./components/pages/UnderDevelopment.jsx";
 import InchargeCreate from "./components/pages/Admin/InchargeCreate.jsx";
 import GenerateReport from "./components/GenerateReport.jsx";
+import Attendance from "./components/pages/Attendence.jsx";
+import AttendanceHistory from "./components/pages/AttendanceHistory.jsx";
+import AdminAttendanceManagement from "./components/pages/Admin/AttendenceCalander.jsx";
+// import AdminAttendence from "./components/pages/Admin/AdminAttendencne.jsx";
+// import AttendanceCalendar from "./components/pages/Admin/AttendenceCalander.jsx";
 
 const App = () => {
   return (
@@ -253,6 +258,33 @@ const App = () => {
               element={
                 <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.PLAZA_INCHARGE, ROLES.PROJECT_INCHARGE]}>
                  <AllIssues/>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/attendence"
+              element={
+                <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.PLAZA_INCHARGE, ROLES.PROJECT_INCHARGE, ROLES.SITE_ENGINEER]}>
+                 <Attendance/>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/adminattendence"
+              element={
+                <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.PLAZA_INCHARGE, ROLES.PROJECT_INCHARGE, ROLES.SITE_ENGINEER]}>
+               <AdminAttendanceManagement/>
+                </ProtectedRoute>
+              }
+            />
+
+<Route
+              path="/attendancehistory"
+              element={
+                <ProtectedRoute roles={[ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.PLAZA_INCHARGE, ROLES.PROJECT_INCHARGE, ROLES.SITE_ENGINEER]}>
+             <AttendanceHistory/>
                 </ProtectedRoute>
               }
             />

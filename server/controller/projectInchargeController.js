@@ -31,74 +31,74 @@ const proejctinchargeController = {
     }
     },
 
-    addSiteEngineer: async (req, res) => {
-        try {
-            const { firstName, lastName, address, phoneNO, username, password, email, assignedPlaza, role, assignedBy } = req.body;
-            if (!firstName || !lastName || !username || !phoneNO || !password || !email || !role) {
-                return res.status(400).json({ message: "all feilds are required" })
-            }
-            console.log("okay");
+    // addSiteEngineer: async (req, res) => {
+    //     try {
+    //         const { firstName, lastName, address, phoneNO, username, password, email, assignedPlaza, role, assignedBy } = req.body;
+    //         if (!firstName || !lastName || !username || !phoneNO || !password || !email || !role) {
+    //             return res.status(400).json({ message: "all feilds are required" })
+    //         }
+    //         console.log("okay");
 
-            const usernameExist = await SiteEngineer.findOne({ username });
-            if (usernameExist) {
-                return res.status(400).json({ message: "username already exist" })
-            }
-            console.log("okay2");
+    //         const usernameExist = await SiteEngineer.findOne({ username });
+    //         if (usernameExist) {
+    //             return res.status(400).json({ message: "username already exist" })
+    //         }
+    //         console.log("okay2");
 
-            if (assignedPlaza) {
-                if (!mongoose.Types.ObjectId.isValid(assignedPlaza)) {
-                    return res.status(403).json({ message: "plazaId is not valid " })
-                }
-                console.log("okay3");
+    //         if (assignedPlaza) {
+    //             if (!mongoose.Types.ObjectId.isValid(assignedPlaza)) {
+    //                 return res.status(403).json({ message: "plazaId is not valid " })
+    //             }
+    //             console.log("okay3");
 
-                const existPlaza = await Plaza.findById(assignedPlaza);
-                if (!existPlaza) {
-                    return res.status(400).json({ message: "no Plaza found with this id" })
-                }
-                console.log("okay4");
+    //             const existPlaza = await Plaza.findById(assignedPlaza);
+    //             if (!existPlaza) {
+    //                 return res.status(400).json({ message: "no Plaza found with this id" })
+    //             }
+    //             console.log("okay4");
 
-            }
-            const existEmail = await SiteEngineer.findOne({ email });
-            if (existEmail) {
-                return res.status(400).json({ message: "email already exist" })
-            }
-            // Check if Site Engineer already exists
-            const existingSiteEngineer = await SiteEngineer.findOne({ username });
-            if (existingSiteEngineer) {
-                return res.status(400).json({ message: "Site Engineer already exists" });
-            }
-            const hash = await authEssentials.createHash(password);
-            // Create a new Site Engineer document
-            const siteEngineer = new SiteEngineer({
-                firstName,
-                lastName,
-                username,
-                address,
-                role,
-                phoneNO,
-                password: hash, // You might want to hash this password before saving
-                email,
-                assignedPlaza,
-                assignedBy: req.user.user,
+    //         }
+    //         const existEmail = await SiteEngineer.findOne({ email });
+    //         if (existEmail) {
+    //             return res.status(400).json({ message: "email already exist" })
+    //         }
+    //         // Check if Site Engineer already exists
+    //         const existingSiteEngineer = await SiteEngineer.findOne({ username });
+    //         if (existingSiteEngineer) {
+    //             return res.status(400).json({ message: "Site Engineer already exists" });
+    //         }
+    //         const hash = await authEssentials.createHash(password);
+    //         // Create a new Site Engineer document
+    //         const siteEngineer = new SiteEngineer({
+    //             firstName,
+    //             lastName,
+    //             username,
+    //             address,
+    //             role,
+    //             phoneNO,
+    //             password: hash, // You might want to hash this password before saving
+    //             email,
+    //             assignedPlaza,
+    //             assignedBy: req.user.user,
 
-            });
+    //         });
 
-            // Save the new Site Engineer to the database
-            await siteEngineer.save();
+    //         // Save the new Site Engineer to the database
+    //         await siteEngineer.save();
 
-            if (assignedPlaza) {
-                await Plaza.findByIdAndUpdate(assignedPlaza, {
-                    $push: { assignedTo: siteEngineer._id }
-                });
-            }
-            console.log(siteEngineer)
-            res.status(201).json(siteEngineer);
-        } catch (error) {
-            console.log(error);
+    //         if (assignedPlaza) {
+    //             await Plaza.findByIdAndUpdate(assignedPlaza, {
+    //                 $push: { assignedTo: siteEngineer._id }
+    //             });
+    //         }
+    //         console.log(siteEngineer)
+    //         res.status(201).json(siteEngineer);
+    //     } catch (error) {
+    //         console.log(error);
 
-            res.status(500).json({ message: error.message });
-        }
-    },
+    //         res.status(500).json({ message: error.message });
+    //     }
+    // },
 
 
     getEngineersNamesByIds: async (req, res) => {
@@ -110,7 +110,7 @@ const proejctinchargeController = {
             }
 
             // Fetch only names of employees with the given IDs
-            const engineers = await SiteEngineer.find({ _id: { $in: engineerIds } }, 'firstName lastName');
+            const engineers = await User.find({ _id: { $in: engineerIds } }, 'firstName lastName');
 
             res.status(200).json({ engineers });
         } catch (error) {
@@ -120,21 +120,31 @@ const proejctinchargeController = {
 
     //get active site engineers
 
-    getActiveEnginrres: async (req, res) => {
+    getActiveUsers: async (req, res) => {
         try {
-            const activeEngineers = await User.find({ isActive: true }).populate('assignedPlaza', "plazaName");
+            const activeEngineers = await User.find({ isActive: true }) .populate({
+                path: "roleHistory.assignedEntity",
+                select: "plazaName projectName", // populate either name field depending on the type
+              })
+              .populate({
+                path: "assignedBy",
+                select: "firstName lastName username",
+              });
 
             if (!activeEngineers) {
                 return res.status(400).json({ message: "not found" })
             }
             return res.status(200).json({ message: "founded", activeEngineers })
         } catch (err) {
+            console.log(err);
+            
             return res.status(500).json({ message: "internal server error" })
         }
     },
 
+
     // Get all Site Engineers
-    getSiteEngineers: async (req, res) => {
+    getAllUsers: async (req, res) => {
         try {
             const siteEngineers = await User.find()
               .populate({
@@ -176,12 +186,14 @@ const proejctinchargeController = {
 
 
     // Update Site Engineer details by ID
-    updateSiteEngineer: async (req, res) => {
+    updateUser: async (req, res) => {
         try {
+            console.log("update user");
+            
             const { id } = req.params;
             const { firstName, lastName, email, assignedPlaza } = req.body;
 
-            const updatedSiteEngineer = await SiteEngineer.findByIdAndUpdate(
+            const updatedSiteEngineer = await User.findByIdAndUpdate(
                 id,
                 { firstName, lastName, email, assignedPlaza, },
                 { new: true } // Returns the updated document
@@ -198,7 +210,7 @@ const proejctinchargeController = {
     },
 
     // Delete Site Engineer by ID
-    deleteSiteEngineer: async (req, res) => {
+    deleteUser: async (req, res) => {
         try {
             console.log("hello");
 
@@ -210,7 +222,7 @@ const proejctinchargeController = {
             }
             console.log("check passed");
 
-            const engineer = await SiteEngineer.findOne({ username });
+            const engineer = await User.findOne({ username });
             console.log(engineer);
 
             if (!engineer) {

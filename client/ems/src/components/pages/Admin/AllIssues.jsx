@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllIssues, getIssuesByProjectId, getIssuesByPlazaId } from "../../../features/issueSlice";
 import { getProjectByInchargeId } from '../../../features/projectSlice';
 import { Eye } from 'lucide-react'; // npm install lucide-react
+import { Pencil } from 'lucide-react'; // npm install lucide-react
 
 const statusColors = {
   Pending: 'bg-red-100 text-red-700',
@@ -20,7 +21,14 @@ const IssueTable = () => {
     dispatch(getProjectByInchargeId());
   }, [dispatch]);
   
+  const [editIssue, setEditIssue] = useState(null);
+  const [formData, setFormData] = useState({
+    remarks: '',
+    status: '',
+    rectifiedTime: '',
+  });
   const projectId = useSelector((state) => state.project?.projects?.[0]?._id); // safer access
+
   
   useEffect(() => {
     if (role === "Admin") {
@@ -35,6 +43,39 @@ const IssueTable = () => {
     }
   }, [dispatch, role, projectId]); // include role and projectId as dependencies
   
+  const handleEditClick = (issue) => {
+    setEditIssue(issue);
+    setFormData({
+      remarks: issue.remarks || '',
+      status: issue.status || '',
+      rectifiedTime: issue.rectifiedTime
+        ? new Date(issue.rectifiedTime).toISOString().slice(0, 16)
+        : '',
+    });
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateSubmit = (e) => {
+    e.preventDefault();
+    if (!editIssue) return;
+
+    dispatch(
+      updateIssue({
+        issueId: editIssue.issueId,
+        updates: {
+          remarks: formData.remarks,
+          status: formData.status,
+          rectifiedTime: new Date(formData.rectifiedTime).toISOString(),
+        },
+      })
+    );
+
+    setEditIssue(null);
+  };
 
   return (
     <div className="p-6 bg-gradient-to-br from-gray-100 to-white min-h-screen">
@@ -64,6 +105,7 @@ const IssueTable = () => {
                   <th className="px-6 py-4">Remarks</th>
                   <th className="px-6 py-4">Rectified By</th>
                   <th className="px-6 py-4">Rectified DateTime</th>
+                  <th className="px-6 py-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,7 +147,19 @@ const IssueTable = () => {
                       </td>
                       <td className="px-6 py-4">{issue?.rectifiedBy?.firstName || '—'}</td>
                       <td className="px-6 py-4"> {issue?.rectifiedTime ? new Date(issue.rectifiedTime).toLocaleString() : '—'}</td>
+                      <td className="px-6 py-4">
+                        {issue.status === "Resolved" && (
+                          <button
+                            className="text-indigo-600 hover:text-indigo-800"
+                            onClick={() => handleEditClick(issue)}
+                            title="Edit Issue"
+                          >
+                            <Pencil className="w-5 h-5" />
+                          </button>
+                        )}
+                      </td>
                     </tr>
+
                   ))
                 )}
               </tbody>
@@ -138,6 +192,68 @@ const IssueTable = () => {
             </div>
           </div>
         )}
+
+        
+        {editIssue && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 relative">
+              <button
+                className="absolute top-3 right-4 text-gray-500 hover:text-gray-800"
+                onClick={() => setEditIssue(null)}
+              >
+                ✖
+              </button>
+              <h3 className="text-xl font-semibold mb-4 text-gray-700">✏ Edit Issue</h3>
+              <form onSubmit={handleUpdateSubmit} className="space-y-4 text-sm text-gray-700">
+                <div>
+                  <label className="block mb-1 font-medium">Remarks</label>
+                  <input
+                    type="text"
+                    name="remarks"
+                    value={formData.remarks}
+                    onChange={handleFormChange}
+                    className="w-full border rounded-md p-2"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium">Status</label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleFormChange}
+                    className="w-full border rounded-md p-2"
+                  >
+                    <option value="">Select status</option>
+                    {statusOptions.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium">Rectified DateTime</label>
+                  <input
+                    type="datetime-local"
+                    name="rectifiedTime"
+                    value={formData.rectifiedTime}
+                    onChange={handleFormChange}
+                    className="w-full border rounded-md p-2"
+                  />
+                </div>
+                <div className="flex justify-end pt-4">
+                  <button
+                    type="submit"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                  >
+                    Update
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

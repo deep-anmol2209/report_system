@@ -28,6 +28,7 @@ function authenticateToken(req, res, next) {
             
         req.user = user; // Attach user details to the request object
         console.log(req.user);
+        console.log("hello");
         
         next();
     });

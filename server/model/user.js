@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+
 const roleHistorySchema = new mongoose.Schema({
   role: {
     type: String,
@@ -46,7 +47,16 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+currentPlaza:{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Plaza'
+},
 
+currentProject:{
+ type: mongoose.Schema.Types.ObjectId,
+  ref: 'Project'
+  
+} ,
   roleHistory: [roleHistorySchema],
 
   assignedBy: {

@@ -2,54 +2,51 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchActiveSiteEngineers, deleteSiteEngineer } from "../../features/siteEngineer.js"; // Adjust the path
 import { toast, ToastContainer } from "react-toastify";
+import { deleteUser, updateUser } from "../../features/userSlice.js";
 
 export default function ManageSiteEngineers() {
   const dispatch = useDispatch();
   const { engineers, status, error } = useSelector((state) => state.siteEngineer);
 
   const [selectedEngineer, setSelectedEngineer] = useState(null);
+  const [editEngineer, setEditEngineer] = useState(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [engineerToDelete, setEngineerToDelete] = useState(null);
-  const [showTransferModal, setShowTransferModal] = useState(false); // NEW
-  const [transferEngineer, setTransferEngineer] = useState(null);     // NEW
   const [currentPage, setCurrentPage] = useState(1);
-  const [newPlazaId, setNewPlazaId] = useState("");
-  const [newProjectId, setNewProjectId] = useState("");
-  const [newRole, setNewRole] = useState("");
   const engineersPerPage = 10;
-
+  
    // Dummy data - replace with your real data sources
-   const plazas = [
-    { _id: "p1", plazaName: "Plaza A" },
-    { _id: "p2", plazaName: "Plaza B" },
-    { _id: "p3", plazaName: "Plaza C" },
-  ];
+  //  const plazas = [
+  //   { _id: "p1", plazaName: "Plaza A" },
+  //   { _id: "p2", plazaName: "Plaza B" },
+  //   { _id: "p3", plazaName: "Plaza C" },
+  // ];
 
-  const projects = [
-    { _id: "proj1", projectName: "Project Alpha" },
-    { _id: "proj2", projectName: "Project Beta" },
-    { _id: "proj3", projectName: "Project Gamma" },
-  ];
+  // const projects = [
+  //   { _id: "proj1", projectName: "Project Alpha" },
+  //   { _id: "proj2", projectName: "Project Beta" },
+  //   { _id: "proj3", projectName: "Project Gamma" },
+  // ];
 
   useEffect(() => {
     dispatch(fetchActiveSiteEngineers());
   }, [dispatch]);
 
-  const handleDelete = (username) => {
-    dispatch(deleteSiteEngineer(username));
-    if (status === "succeeded") {
+ const handleDelete = (username) => {
+    dispatch(deleteUser(username)).then(() => {
       toast.success("Engineer deleted successfully");
-    }
-    dispatch(fetchActiveSiteEngineers());
-    setShowDeleteConfirmation(false);
+      dispatch(fetchActiveSiteEngineers());
+      setShowDeleteConfirmation(false);
+    });
   };
 
-  const roles = ["plaza_engineer", "plaza_incharge"];
-
-  const handleConfirmTransfer = () => {
-    // Send API call or dispatch Redux action here
-    toast.success("Engineer transferred successfully!");
-    setShowTransferModal(false);
+  const handleUpdate = () => {
+    if (!editEngineer) return;
+    dispatch(updateUser({ id: editEngineer._id, updatedData: editEngineer })).then(() => {
+      toast.success("Engineer updated successfully");
+      setEditEngineer(null);
+      dispatch(fetchActiveSiteEngineers());
+    });
   };
   const indexOfLastEngineer = currentPage * engineersPerPage;
   const indexOfFirstEngineer = indexOfLastEngineer - engineersPerPage;
@@ -72,14 +69,16 @@ export default function ManageSiteEngineers() {
               </tr>
             </thead>
             <tbody>
-              {currentEngineers.map((engineer) => (
+              {currentEngineers.map((engineer) => {
+                 const latestRole = engineer.roleHistory?.[engineer.roleHistory.length - 1];
+                return(
                 <tr key={engineer._id} className="border-b hover:bg-gray-50 transition">
                   <td className="py-3 px-4">{engineer.firstName}</td>
                   <td className="py-3 px-4">{engineer.lastName}</td>
                   <td className="py-3 px-4">{engineer.username}</td>
                   <td className="py-3 px-4">{engineer.email}</td>
-                  <td className="py-3 px-4">{engineer.assignedPlaza?.plazaName}</td>
-                  <td className="py-3 px-4">{engineer.role}</td>
+                  <td className="py-3 px-4">{latestRole?.assignedEntity?.projectName || latestRole?.assignedEntity?.plazaName || "N/A"}</td>
+                  <td className="py-3 px-4">{latestRole?.role || "N/A"}</td>
                   <td className="py-3 px-4 flex space-x-2">
                     <button
                       className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
@@ -88,14 +87,11 @@ export default function ManageSiteEngineers() {
                       View
                     </button>
                     <button
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-600 transition"
-                      onClick={() => {
-                        setTransferEngineer(engineer);
-                        setShowTransferModal(true);
-                      }}
-                    >
-                      Transfer
-                    </button>
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
+                        onClick={() => setEditEngineer(engineer)}
+                      >
+                        Update
+                      </button>
                     <button
                       className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition"
                       onClick={() => {
@@ -107,7 +103,7 @@ export default function ManageSiteEngineers() {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
@@ -139,6 +135,71 @@ export default function ManageSiteEngineers() {
           </div>
         </div>
       )}
+      {/* Update Modal */}
+      {/* Update Modal */}
+      {editEngineer && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Edit Engineer</h3>
+
+            <input
+              className="w-full mb-2 p-2 border rounded"
+              value={editEngineer.firstName}
+              onChange={(e) => setEditEngineer({ ...editEngineer, firstName: e.target.value })}
+              placeholder="First Name"
+            />
+            <input
+              className="w-full mb-2 p-2 border rounded"
+              value={editEngineer.lastName}
+              onChange={(e) => setEditEngineer({ ...editEngineer, lastName: e.target.value })}
+              placeholder="Last Name"
+            />
+            <input
+              className="w-full mb-2 p-2 border rounded"
+              value={editEngineer.email}
+              onChange={(e) => setEditEngineer({ ...editEngineer, email: e.target.value })}
+              placeholder="Email"
+            />
+            <input
+              className="w-full mb-2 p-2 border rounded"
+              value={editEngineer.address?.city || ""}
+              onChange={(e) =>
+                setEditEngineer({
+                  ...editEngineer,
+                  address: { ...editEngineer.address, city: e.target.value },
+                })
+              }
+              placeholder="City"
+            />
+            <input
+              className="w-full mb-2 p-2 border rounded"
+              value={editEngineer.address?.state || ""}
+              onChange={(e) =>
+                setEditEngineer({
+                  ...editEngineer,
+                  address: { ...editEngineer.address, state: e.target.value },
+                })
+              }
+              placeholder="State"
+            />
+
+            <div className="flex justify-end mt-4 space-x-2">
+              <button
+                className="px-4 py-2 bg-gray-400 text-white rounded-lg shadow-md hover:bg-gray-500 transition"
+                onClick={() => setEditEngineer(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
+                onClick={handleUpdate}
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirmation && (
@@ -165,83 +226,7 @@ export default function ManageSiteEngineers() {
       )}
 
       {/* Transfer Modal */}
-      {showTransferModal && transferEngineer && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-[400px]">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Transfer Site Engineer</h3>
-            
-            <div className="mb-3">
-              <p><strong>Username:</strong> {transferEngineer.username}</p>
-              <p><strong>Current Role:</strong> {transferEngineer.role}</p>
-              <p><strong>Current Plaza:</strong> {transferEngineer.assignedPlaza?.plazaName}</p>
-              <p><strong>Current Project:</strong> {transferEngineer.assignedProject?.projectName}</p>
-            </div>
-
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">Select New Plaza</label>
-              <select
-                className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
-                value={newPlazaId}
-                onChange={(e) => setNewPlazaId(e.target.value)}
-              >
-                <option value="">Select Plaza</option>
-                {plazas.map((p) => (
-                  <option key={p._id} value={p._id}>
-                    {p.plazaName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">Select New Project</label>
-              <select
-                className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
-                value={newProjectId}
-                onChange={(e) => setNewProjectId(e.target.value)}
-              >
-                <option value="">Select Project</option>
-                {projects.map((proj) => (
-                  <option key={proj._id} value={proj._id}>
-                    {proj.projectName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Select New Role</label>
-              <select
-                className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
-                value={newRole}
-                onChange={(e) => setNewRole(e.target.value)}
-              >
-                <option value="">Select Role</option>
-                {roles.map((role) => (
-                  <option key={role} value={role}>
-                    {role}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <button
-                className="px-4 py-2 bg-gray-400 text-white rounded-lg shadow-md hover:bg-gray-500 transition"
-                onClick={() => setShowTransferModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
-                onClick={handleConfirmTransfer}
-              >
-                Confirm Transfer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
     
     
 

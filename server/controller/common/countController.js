@@ -1,8 +1,8 @@
 import Issue from "../../model/issueModel.js";
 import Plaza from "../../model/plazaModel.js";
-import ProjectIncharge from "../../model/projectEngineerModel.js";
+import {User} from "../../model/user.js"
 import Project from "../../model/projectModel.js"
-import SiteEngineer from "../../model/siteEngineerModel.js";
+
 
  const countController = {
         count: async (req, res) => {
@@ -11,9 +11,9 @@ import SiteEngineer from "../../model/siteEngineerModel.js";
             
             const totalPlazas= await Plaza.countDocuments({isActive: true});
 
-            const totalSiteEngineers= await SiteEngineer.countDocuments({isActive: true});
+            const totalSiteEngineers= await User.countDocuments({isActive: true});
 
-            const totalProjectIncharges= await ProjectIncharge.countDocuments({isActive: true})
+            const totalProjectIncharges= await User.countDocuments({isActive: true, role: "project_incharge"})
 
             const totalPendingIssues= await Issue.countDocuments({status: "Pending"})
 

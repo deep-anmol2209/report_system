@@ -1,7 +1,7 @@
 import { useState , useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
-import { addIssue, getPendingIssuesById } from "../../features/issueSlice";
+import { addIssue, getPendingIssuesById } from "../../features/issueSlice.js";
 import { CustomSelect } from "./Admin/AddSiteEngineer.jsx";
 import { getProjectByInchargeId } from "../../features/projectSlice"; 
 import "react-toastify/dist/ReactToastify.css";
