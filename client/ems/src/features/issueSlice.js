@@ -7,7 +7,7 @@ import Project from "../../../../server/model/projectModel";
 export const addIssue = createAsyncThunk("plaza/addIssue", async (payload, { rejectWithValue, getState }) => {
   try {
     const token = getState().auth.token;
-    const response = await axios.post("https://mepl-erp.co.in/api/superadmin/add-issue", payload, {
+    const response = await axios.post("https://mepl-erp.co.in/superadmin/add-issue", payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -22,7 +22,7 @@ export const addIssue = createAsyncThunk("plaza/addIssue", async (payload, { rej
 export const getAllPendingIssues = createAsyncThunk("plaza/getAllPendingIssues", async (_, { rejectWithValue, getState }) => {
   try {
     const token = getState().auth.token;
-    const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-allPendingIssues", {
+    const response = await axios.get("https://mepl-erp.co.in/superadmin/get-allPendingIssues", {
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log("API Response:", response.data);
@@ -37,7 +37,7 @@ export const getAllPendingIssues = createAsyncThunk("plaza/getAllPendingIssues",
 export const getIssuesByPlazaId = createAsyncThunk("plaza/getIssuesByPlazaId", async (_, { rejectWithValue, getState }) => {
   try {
     const token = getState().auth.token;
-    const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-issuesByPlazaId", {
+    const response = await axios.get("https://mepl-erp.co.in/superadmin/get-issuesByPlazaId", {
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log("API Response:", response.data);
@@ -53,7 +53,7 @@ export const getIssuesByPlazaId = createAsyncThunk("plaza/getIssuesByPlazaId", a
 export const getAllIssues = createAsyncThunk("plaza/getAllIssues", async (_, { rejectWithValue, getState }) => {
   try {
     const token = getState().auth.token;
-    const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-allIssues", {
+    const response = await axios.get("https://mepl-erp.co.in/superadmin/get-allIssues", {
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log("API Response:", response.data);
@@ -70,7 +70,7 @@ export const resolveIssue = createAsyncThunk(
   async ({ issueId, remarks }, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.post("https://mepl-erp.co.in/api/superadmin/resolve-issue", {
+      const response = await axios.post("https://mepl-erp.co.in/superadmin/resolve-issue", {
         issueId,
         remarks,
       }, {
@@ -95,7 +95,7 @@ export const getPendingIssuesById = createAsyncThunk(
 
     try {
       const token = getState().auth.token;
-      const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-allPendingIssuesById", {
+      const response = await axios.get("https://mepl-erp.co.in/superadmin/get-allPendingIssuesById", {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(response);
@@ -115,7 +115,7 @@ export const getIssuesByProjectId = createAsyncThunk("issues/getIssuesByProjectI
 
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`https://mepl-erp.co.in/api/superadmin/get-projectIssues/${projectId}`, {
+      const response = await axios.get(`https://mepl-erp.co.in/superadmin/get-projectIssues/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(response);
@@ -135,7 +135,7 @@ export const updateIssue = createAsyncThunk("issues/getIssuesByProjectId",
 
     try {
       const token = getState().auth.token;
-      const response = await axios.put(`https://mepl-erp.co.in/api/superadmin/updateIssue,payload`, {
+      const response = await axios.put(`https://mepl-erp.co.in/superadmin/updateIssue,payload`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
