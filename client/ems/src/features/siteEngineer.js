@@ -7,7 +7,7 @@ export const fetchSiteEngineers = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
-      const response = await axios.get("https://mepl-erp.co.in/superadmin/get-allsiteengineers", {
+      const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-allsiteengineers", {
         headers: { Authorization: `Bearer ${token}` }, // Attach token in headers
       });
 
@@ -28,7 +28,7 @@ export const fetchActiveSiteEngineers = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token; // Get token from Redux store
-      const response = await axios.get("https://mepl-erp.co.in/superadmin/get-activeEngineers", {
+      const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-activeEngineers", {
         headers: { Authorization: `Bearer ${token}` }, // Attach token in headers
       });
 
@@ -52,7 +52,7 @@ export const getEngineerNamesByIds = createAsyncThunk("admin/getPlazaNames", asy
     // Ensure it's an actual array
     const formattedEngineerIds = Array.isArray(engineerIds) ? [...engineerIds] : [];
     
-    const response = await axios.post("https://mepl-erp.co.in/superadmin/get-nameById", {engineerIds: formattedEngineerIds}  , {
+    const response = await axios.post("https://mepl-erp.co.in/api/superadmin/get-nameById", {engineerIds: formattedEngineerIds}  , {
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log(response);
@@ -75,7 +75,7 @@ export const addSiteEngineer = createAsyncThunk(
   
         const token = getState().auth.token; // Ensure getState is included in parameters
         const response = await axios.post(
-          "https://mepl-erp.co.in/superadmin/add-engineer",
+          "https://mepl-erp.co.in/api/superadmin/add-engineer",
           payload,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -100,7 +100,7 @@ export const deleteSiteEngineer = createAsyncThunk(
       console.log(username);
       
       const token = getState().auth.token;
-      await axios.delete(`https://mepl-erp.co.in/superadmin/delete-engineer/${username}`, {
+      await axios.delete(`https://mepl-erp.co.in/api/superadmin/delete-engineer/${username}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -120,7 +120,7 @@ export const updateSiteEngineer = createAsyncThunk(
     try {
       const token = getState().auth.token;
       const response = await axios.put(
-        `https://mepl-erp.co.in/superadmin/update-siteengineer/${id}`,
+        `https://mepl-erp.co.in/api/superadmin/update-siteengineer/${id}`,
         updatedData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

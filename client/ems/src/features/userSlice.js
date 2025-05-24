@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'https://mepl-erp.co.in/superadmin/allusers';
+const API_URL = 'https://mepl-erp.co.in/api/superadmin/allusers';
 
 // Async Thunks
 
