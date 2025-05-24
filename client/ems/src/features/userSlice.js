@@ -71,7 +71,7 @@ export const updateUser = createAsyncThunk(
       };
    console.log(payload);
    
-      const response = await axios.put(`https://mepl-erp.co.in/superadmin/update-user/${payload.id}`, payload.updatedData, config);
+      const response = await axios.put(`https://mepl-erp.co.in/api/superadmin/update-user/${payload.id}`, payload.updatedData, config);
       console.log(response);
       
       return response.data;
@@ -97,7 +97,7 @@ export const deleteUser = createAsyncThunk(
         },
       };
 
-      const response = await axios.delete(`https://mepl-erp.co.in/superadmin/delete-user/${userId}`, config);
+      const response = await axios.delete(`https://mepl-erp.co.in/api/superadmin/delete-user/${userId}`, config);
       return response.data;
     } catch (error) {
       return rejectWithValue(

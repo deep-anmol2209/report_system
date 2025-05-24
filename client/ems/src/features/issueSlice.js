@@ -135,7 +135,7 @@ export const updateIssue = createAsyncThunk("issues/getIssuesByProjectId",
 
     try {
       const token = getState().auth.token;
-      const response = await axios.put(`https://mepl-erp.co.in/superadmin/updateIssue,payload`, {
+      const response = await axios.put(`https://mepl-erp.co.in/api/superadmin/updateIssue,payload`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

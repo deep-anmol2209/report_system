@@ -8,7 +8,7 @@ export const fetchCounts = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get("https://mepl-erp.co.in/superadmin/get-counts", {
+      const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-counts", {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(response);
