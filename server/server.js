@@ -31,7 +31,7 @@ const allowedOrigins = [
   );
 
 app.use('/api/user', authRoutes);
-app.use('/superadmin', commonRoutes);
+app.use('/api/superadmin', commonRoutes);
 app.use('/api/attendence', attendenceRoutes)
 
 
