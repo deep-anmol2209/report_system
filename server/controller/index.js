@@ -10,12 +10,12 @@ const authEssentials = {
   },
 
   createToken: (payload) => {
-    return jwt.sign(payload, dotenvVar.JWT_SECRET, { expiresIn: "1m" });
+    return jwt.sign(payload, dotenvVar.JWT_SECRET, { expiresIn: "1d" });
   },
 
-  createRefreshToken :(payload)=>{
-   return jwt.sign(payload, dotenvVar.REFRESH_SECRET, {expiresIn: "7d"})
-  },
+  // createRefreshToken :(payload)=>{
+  //  return jwt.sign(payload, dotenvVar.REFRESH_SECRET, {expiresIn: "7d"})
+  // },
 
   verifyPassword: async (usergiven, existpassword) => {
     return await bcrypt.compare(usergiven, existpassword);
