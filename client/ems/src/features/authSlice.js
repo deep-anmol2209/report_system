@@ -2,8 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../components/axiosInstance.js";
 import { jwtDecode } from "jwt-decode";
 
-const REFRESH_URL = "api/user/refresh-token";
-
 // Check if the token is expired
 const isTokenExpired = (token) => {
   if (!token) return true;
@@ -24,43 +22,18 @@ const initialState = {
   token: storedToken || null,
   isAuthenticated: storedToken ? !isTokenExpired(storedToken) : false,
   error: null,
-  loading: true, // Added loading state
+  loading: false,
 };
 
 // *Login Thunk*
 export const loginUser = createAsyncThunk(
-  "api/auth/loginUser",
+  "auth/loginUser",
   async (credentials, { rejectWithValue }) => {
     try {
       const { data } = await axiosInstance.post("api/user/login", credentials);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
-    }
-  }
-);
-
-// *Refresh Token Thunk*
-export const refreshAccessToken = createAsyncThunk(
-  "auth/refreshAccessToken",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post(
-        REFRESH_URL,
-        {},
-        { withCredentials: true }
-      );
-
-      if (!response.data || !response.data.accesstoken) {
-        throw new Error("Invalid token response");
-      }
-
-      return response.data.accesstoken;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        return rejectWithValue("Session expired, please log in again");
-      }
-      return rejectWithValue("Failed to refresh token");
     }
   }
 );
@@ -75,7 +48,7 @@ const authSlice = createSlice({
       return {
         ...initialState,
         isAuthenticated: false,
-        loading: false, // make sure loading is false on logout
+        loading: false,
       };
     },
   },
@@ -91,8 +64,8 @@ const authSlice = createSlice({
         state.token = payload.token;
         state.isEngineerAlso = payload.isEngineerAlso;
         state.isAuthenticated = true;
-        state.error = null;
         state.loading = false;
+        state.error = null;
 
         // Save to localStorage
         localStorage.setItem("token", payload.token);
@@ -107,23 +80,7 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, { payload }) => {
         state.error = payload;
         state.loading = false;
-      })
-      .addCase(refreshAccessToken.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(refreshAccessToken.fulfilled, (state, { payload }) => {
-        state.token = payload;
-        state.isAuthenticated = true;
-        state.loading = false;
-
-        // Save refreshed token
-        localStorage.setItem("token", payload);
-      })
-      .addCase(refreshAccessToken.rejected, (state, { payload }) => {
-        state.token = null;
         state.isAuthenticated = false;
-        state.error = payload;
-        state.loading = false;
       });
   },
 });

@@ -1,38 +1,48 @@
-import store from "../app/store";
 import axios from "axios";
-import { refreshAccessToken, logout } from "../features/authSlice";
+import store from "../app/store";
+import { logout } from "../features/authSlice";
+import { jwtDecode } from "jwt-decode";
 
-
+// Create Axios instance
 const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL_DEVELOPMENT, // Replace with your backend URL
-    withCredentials: true,
-  });
+  baseURL: import.meta.env.VITE_API_URL_DEVELOPMENT,
+  withCredentials: true,
+});
 
+// Attach Authorization token to each request
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const state = store.getState();
+    const token = state.auth.token;
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Handle expired token response
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  (error) => {
+    if (error.response?.status === 401) {
+      const state = store.getState();
+      const token = state.auth.token;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
+      // Check if token is expired (fallback logic)
+      let isExpired = true;
       try {
-        const newToken = await store.dispatch(refreshAccessToken()).unwrap();
+        const { exp } = jwtDecode(token);
+        isExpired = exp * 1000 < Date.now();
+      } catch {
+        isExpired = true;
+      }
 
-        if (!newToken) throw new Error("Invalid token received");
-
-        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-
-        return axiosInstance(originalRequest);
-      } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-
-        if (refreshError.response?.status === 401) {
-          store.dispatch(logout());
-        }
-
-        return Promise.reject(refreshError);
+      if (isExpired) {
+        store.dispatch(logout());
       }
     }
 
