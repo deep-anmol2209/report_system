@@ -68,9 +68,9 @@ const authController= {
     
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,  
-                secure: false,    
+                secure: true,    
                 maxAge: 7 * 24 * 60 * 60 * 1000, 
-                sameSite: "Lax",
+                sameSite: "none",
                 path: "/"
             });
             console.log("Set-Cookie header sent:", refreshToken); // Debug log
