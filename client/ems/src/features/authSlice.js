@@ -16,6 +16,7 @@ const isTokenExpired = (token) => {
 
 // Load auth data from localStorage
 const storedToken = localStorage.getItem("token");
+
 const initialState = {
   user: JSON.parse(localStorage.getItem("user")) || null,
   role: JSON.parse(localStorage.getItem("role")) || null,
@@ -23,37 +24,46 @@ const initialState = {
   token: storedToken || null,
   isAuthenticated: storedToken ? !isTokenExpired(storedToken) : false,
   error: null,
+  loading: true, // Added loading state
 };
 
 // *Login Thunk*
-export const loginUser = createAsyncThunk("api/auth/loginUser", async (credentials, { rejectWithValue }) => {
-  try {
-    const { data } = await axiosInstance.post("api/user/login", credentials);
-    console.log(data);
-    
-    return data; // Return data directly; reducer will handle storage updates
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || "Login failed");
+export const loginUser = createAsyncThunk(
+  "api/auth/loginUser",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.post("api/user/login", credentials);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Login failed");
+    }
   }
-});
+);
 
 // *Refresh Token Thunk*
-export const refreshAccessToken = createAsyncThunk("auth/refreshAccessToken", async (_, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.post(REFRESH_URL, {}, { withCredentials: true });
+export const refreshAccessToken = createAsyncThunk(
+  "auth/refreshAccessToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        REFRESH_URL,
+        {},
+        { withCredentials: true }
+      );
 
-    if (!response.data || !response.data.accesstoken) {
-      throw new Error("Invalid token response");
-    }
+      if (!response.data || !response.data.accesstoken) {
+        throw new Error("Invalid token response");
+      }
 
-    return response.data.accesstoken;
-  } catch (error) {
-    if (error.response?.status === 401) {
-      return rejectWithValue("Session expired, please log in again");
+      return response.data.accesstoken;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return rejectWithValue("Session expired, please log in again");
+      }
+      return rejectWithValue("Failed to refresh token");
     }
-    return rejectWithValue("Failed to refresh token");
   }
-});
+);
 
 // *Auth Slice*
 const authSlice = createSlice({
@@ -62,31 +72,49 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       localStorage.clear();
-      return { ...initialState, isAuthenticated: false };
+      return {
+        ...initialState,
+        isAuthenticated: false,
+        loading: false, // make sure loading is false on logout
+      };
     },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(loginUser.fulfilled, (state, { payload }) => {
         state.user = payload.user;
         state.role = payload.role;
         state.token = payload.token;
-        state.isEngineerAlso= payload.isEngineerAlso
+        state.isEngineerAlso = payload.isEngineerAlso;
         state.isAuthenticated = true;
         state.error = null;
+        state.loading = false;
 
         // Save to localStorage
         localStorage.setItem("token", payload.token);
         localStorage.setItem("user", JSON.stringify(payload.user));
         localStorage.setItem("role", JSON.stringify(payload.role));
-       payload.isEngineerAlso? localStorage.setItem("isEngineerAlso", JSON.stringify(payload.isEngineerAlso)): localStorage.setItem("isEngineerAlso", null)
+        if (payload.isEngineerAlso !== undefined && payload.isEngineerAlso !== null) {
+          localStorage.setItem("isEngineerAlso", JSON.stringify(payload.isEngineerAlso));
+        } else {
+          localStorage.removeItem("isEngineerAlso");
+        }
       })
       .addCase(loginUser.rejected, (state, { payload }) => {
         state.error = payload;
+        state.loading = false;
+      })
+      .addCase(refreshAccessToken.pending, (state) => {
+        state.loading = true;
       })
       .addCase(refreshAccessToken.fulfilled, (state, { payload }) => {
         state.token = payload;
         state.isAuthenticated = true;
+        state.loading = false;
 
         // Save refreshed token
         localStorage.setItem("token", payload);
@@ -95,6 +123,7 @@ const authSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         state.error = payload;
+        state.loading = false;
       });
   },
 });

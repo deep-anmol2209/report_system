@@ -4,15 +4,13 @@ import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { refreshAccessToken, logout } from "../features/authSlice";
 
-// Helper function to check if the token is expiring soon
+// Check if token is expiring in the next 60 seconds
 const isTokenExpiringSoon = (token) => {
   if (!token) return true;
   try {
     const { exp } = jwtDecode(token);
-    const expiryTime = exp * 1000;
-    const currentTime = Date.now();
-    return expiryTime - currentTime < 60000; // Less than 60 seconds left
-  } catch (error) {
+    return exp * 1000 - Date.now() < 60000;
+  } catch {
     return true;
   }
 };
@@ -28,7 +26,7 @@ const ProtectedRoute = ({ children, roles }) => {
       return;
     }
 
-    const refreshToken = async () => {
+    const refreshTokenIfNeeded = async () => {
       if (isTokenExpiringSoon(token)) {
         try {
           await dispatch(refreshAccessToken()).unwrap();
@@ -38,44 +36,35 @@ const ProtectedRoute = ({ children, roles }) => {
       }
     };
 
-    // Set an interval to check the token expiration every 60 seconds
-    const interval = setInterval(refreshToken, 50000); // Check every 60s
-    refreshToken(); // Run once on mount
+    refreshTokenIfNeeded(); // run once on mount
 
-    // Cleanup interval when component unmounts
+    const interval = setInterval(refreshTokenIfNeeded, 50000); // every 50s
     return () => clearInterval(interval);
   }, [token, dispatch]);
 
-  // Redirect to login if the user is not authenticated or token is missing/expired
+  // Redirect if not authenticated or no token
   if (!isAuthenticated || !token) {
-    console.log(isAuthenticated);
-    console.log(token);
-    
-    
     console.log("redirected to login");
-    
     return <Navigate to="/login" replace />;
   }
 
-  // Redirect to unauthorized page if the user's role is not allowed
-  if (roles && !roles.includes(role)) {
-   if(role=== "project_incharge" && isEngineerAlso=== true){
-    return children;
-   }
-    else{
+  // Role-based access control
+  const isAuthorized = () => {
+    if (!roles) return true; // if no roles defined, allow all authenticated users
+
+    if (roles.includes(role)) return true;
+
+    // Special case: project_incharge who is also engineer
+    if (role === "project_incharge" && isEngineerAlso === true) return true;
+
+    return false;
+  };
+
+  if (!isAuthorized()) {
+    console.log("redirected to unauthorized");
     return <Navigate to="/unauthorized" replace />;
-    }
   }
 
-  else{
-
-  if (roles && !roles.includes(role)) {
-    console.log(role);
-    
-    return <Navigate to="/unauthorized" replace />;
-  }
-  }
-  // If authenticated and role is allowed, render the children
   return children;
 };
 
