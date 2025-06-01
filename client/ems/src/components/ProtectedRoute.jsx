@@ -48,6 +48,12 @@ const ProtectedRoute = ({ children, roles }) => {
 
   // Redirect to login if the user is not authenticated or token is missing/expired
   if (!isAuthenticated || !token) {
+    console.log(isAuthenticated);
+    console.log(token);
+    
+    
+    console.log("redirected to login");
+    
     return <Navigate to="/login" replace />;
   }
 
