@@ -21,6 +21,7 @@ export async function generatePDF(filters = {}) {
         flag=1;
         // Fetch project and its plaza IDs
         const project = await Project.findById(projectId).populate("plazas", "_id");
+        var name= project.projectName
     
         if (!project) {
           console.log("no projectFound");
@@ -113,7 +114,7 @@ export async function generatePDF(filters = {}) {
     <head>
       <style>
         body { font-family: Arial, sans-serif; }
-        h1 { text-align: center; }
+        h1,h2 { text-align: center; }
         table {
           width: 100%;
           border-collapse: collapse;
@@ -132,6 +133,7 @@ export async function generatePDF(filters = {}) {
     </head>
     <body>
       <h1>Issue Report</h1>
+      ${projectId && `<h2>${name}</h2>`}
       <table>
         <thead>
           <tr>
