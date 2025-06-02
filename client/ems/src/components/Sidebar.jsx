@@ -35,7 +35,7 @@ const Sidebar = () => {
   const roleBasedMenu = {
     SuperAdmin: ["Dashboard", "Projects", "Project Incharge", "Admin", "Issue", "Site Engineers", "Plaza"],
     Admin: ["Dashboard", "Projects", "Admin", "Project Incharge", "Issue", "Site Engineers", "Plaza", "Generate Report", "Admin-Attendance"],
-    project_incharge: ["Dashboard", "Projects", "Issue"],
+    project_incharge: ["Dashboard", "Projects", "Issue", "Attendance"],
     site_engineer: ["Dashboard", "Issue", "Track Issue", "Attendance"],
     plaza_incharge: ["Dashboard", "Issue", "Plaza Issues"]
   };
