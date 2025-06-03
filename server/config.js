@@ -11,6 +11,8 @@ const dotenvVar= {
     JWT_SECRET: process.env.JWT_SECRET,
     MONGODB_URI: process.env.MONGODB_URI,
     SALT: process.env.SALT,
+    USER_MAILER: process.env.USER_MAILER,
+    PASS_MAILER: process.env.PASS_MAILER,
    ADMIN_USERNAME: process.env.ADMIN_USERNAME,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
