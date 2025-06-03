@@ -57,7 +57,16 @@ export async function generatePDF(filters = {}) {
     }
     if (plazaMap?.id) {
       query.plazaId = plazaMap.id;
+    
+      // Get issues from today only
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+    
+      query.issueTime = { $gte: today, $lt: tomorrow };
     }
+    
   
     if (startDate && endDate) {
       query['issueTime'] = { $gte: new Date(startDate), $lte: new Date(endDate) };

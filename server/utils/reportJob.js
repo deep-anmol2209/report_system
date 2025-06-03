@@ -18,7 +18,7 @@ import { generatePDF } from "./pdfgenerate.js";
   
     const mailOptions = {
       from: dotenvVar.PASS_MAILER,
-      to: 'anmol222006@gmail.com',
+      to: ['sanjaykumargola@gmail.com', 'anmol222006@gmail.com'],
       subject: 'Daily Issue Report',
       text: 'Attached is the daily issue report.',
       attachments: attachments
