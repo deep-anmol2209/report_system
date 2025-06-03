@@ -59,8 +59,8 @@ export async function generatePDF(filters = {}) {
       query.plazaId = plazaMap.id;
     
       // Hardcoded date range: June 3, 2024
-      const startDate = new Date('2024-06-03T00:00:00');
-      const endDate = new Date('2024-06-04T00:00:00');
+      const startDate = new Date('2025-06-03T00:00:00');
+      const endDate = new Date('2025-06-04T00:00:00');
     
       query.issueTime = { $gte: startDate, $lt: endDate };
     }
