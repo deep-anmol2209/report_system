@@ -1,13 +1,16 @@
 import puppeteer from 'puppeteer';
 import Issue from '../model/issueModel.js';
 import attendenceModel from '../model/attendenceMOdel.js';
+import {User} from "../model/user.js"
+import Admin from "../model/adminModel.js"
+import Plaza from '../model/plazaModel.js';
 import Project from '../model/projectModel.js';
 import fs from 'fs';
 import path from 'path';
 
 export async function generatePDF(filters = {}) {
   let flag= 0;
-  const { engineerId, projectId, plazaId, startDate, endDate } = filters;
+  const { engineerId, projectId, plazaId, plazaMap, startDate, endDate } = filters;
  let query={};
     if (engineerId) {
       query['$or'] = [
@@ -51,6 +54,9 @@ export async function generatePDF(filters = {}) {
       console.log(plazaId);
       
       query['plazaId'] = plazaId;  // Filter specifically by plaza
+    }
+    if (plazaMap?.id) {
+      query.plazaId = plazaMap.id;
     }
   
     if (startDate && endDate) {
@@ -133,7 +139,7 @@ export async function generatePDF(filters = {}) {
     </head>
     <body>
       <h1>Issue Report</h1>
-      ${projectId && `<h2>${name}</h2>`}
+      ${projectId ? `<h2>${name}</h2>` : (plazaMap && plazaMap.name ? `<h2>${plazaMap.name}</h2>` : '')}
       <table>
         <thead>
           <tr>
