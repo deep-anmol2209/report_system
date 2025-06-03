@@ -58,14 +58,13 @@ export async function generatePDF(filters = {}) {
     if (plazaMap?.id) {
       query.plazaId = plazaMap.id;
     
-      // Get issues from today only
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
+      // Hardcoded date range: June 3, 2024
+      const startDate = new Date('2024-06-03T00:00:00');
+      const endDate = new Date('2024-06-04T00:00:00');
     
-      query.issueTime = { $gte: today, $lt: tomorrow };
+      query.issueTime = { $gte: startDate, $lt: endDate };
     }
+    
     
   
     if (startDate && endDate) {
