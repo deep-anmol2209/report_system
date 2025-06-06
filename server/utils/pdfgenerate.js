@@ -58,15 +58,15 @@ export async function generatePDF(filters = {}) {
     if (plazaMap?.id) {
       query.plazaId = plazaMap.id;
     
-      // Set the date to 5 June 2025 (midnight)
-      const june5 = new Date("2025-06-05T00:00:00.000Z");
+      // Dynamic date range: today from 00:00:00 to 23:59:59
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Start of today (midnight)
     
-      // Set to start of 6 June 2025 for upper bound
-      const june6 = new Date("2025-06-06T00:00:00.000Z");
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1); // Start of next day
     
-      query.issueTime = { $gte: june5, $lt: june6 };
+      query.issueTime = { $gte: today, $lt: tomorrow };
     }
-    
     
     
     
