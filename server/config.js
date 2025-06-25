@@ -8,6 +8,7 @@ import authEssentials from "./controller/index.js";
 
 const dotenvVar= {
     PORT: process.env.PORT,
+    CLIENT_URL: process.env.CLIENT_URL,
     JWT_SECRET: process.env.JWT_SECRET,
     MONGODB_URI: process.env.MONGODB_URI,
     SALT: process.env.SALT,

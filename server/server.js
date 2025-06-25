@@ -10,21 +10,11 @@ const app= express()
 app.use(cookieParser())
 app.use(express.json())
 
-const allowedOrigins = [
 
-    "https://report-system-phi.vercel.app"
-    
-  ];
   
   app.use(
     cors({
-      origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
+      origin: dotenvVar.CLIENT_URL,
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE"],
     })
