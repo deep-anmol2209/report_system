@@ -14,7 +14,7 @@ import UserSelector from '../../UserSelector';
 
 const AdminAttendanceManagement = () => {
   const token = localStorage.getItem('token')
-  const apiUrl = "https://mepl-erp.co.in/api/attendence/generate-attendance"
+  const apiUrl = "https://report-system-ts1c.onrender.com/api/attendence/generate-attendance"
   const dispatch = useDispatch();
   const { allAttendance, loading, error, success } = useSelector((state) => state.attendance);
   const { users } = useSelector((state) => state.users);

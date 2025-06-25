@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { format } from 'date-fns';
 
-const API_URL = 'https://mepl-erp.co.in/api/attendence';
+const API_URL = 'https://report-system-ts1c.onrender.com/api/attendence';
 
 // Async Thunks
 export const markAttendance = createAsyncThunk(

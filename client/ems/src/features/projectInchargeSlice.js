@@ -6,7 +6,7 @@ import { getallactiveAdmins } from "./adminSlice";
 export const getallProjectIncharge = createAsyncThunk("admin/getAllProjectIncharge", async (_, {rejectWithValue, getState}) => {
     try{
         const token = getState().auth.token; // Get token from auth state
-  const response = await axios.get("https://mepl-erp.co.in/api/superadmin/get-allprojectIncharge",{
+  const response = await axios.get("https://report-system-ts1c.onrender.com/api/superadmin/get-allprojectIncharge",{
     headers: { Authorization: `Bearer ${token}` }, // Attach token in headers
   });
   console.log(response);
@@ -20,7 +20,7 @@ export const getallProjectIncharge = createAsyncThunk("admin/getAllProjectInchar
   export const addProjectIncharge = createAsyncThunk("admin/addProjectIncharge", async (payload, {rejectWithValue, getState}) => {
     try{
         const token= getState().auth.token
-  const response = await axios.post("https://mepl-erp.co.in/api/superadmin/add-projectIncharge", payload,{
+  const response = await axios.post("https://report-system-ts1c.onrender.com/api/superadmin/add-projectIncharge", payload,{
     headers: {Authorization: `Bearer ${token}`},
   });
   console.log(response);
@@ -34,7 +34,7 @@ export const getallProjectIncharge = createAsyncThunk("admin/getAllProjectInchar
   export const changeRole = createAsyncThunk("admin/changeRole", async (payload, {rejectWithValue, getState}) => {
     try{
         const token= getState().auth.token
-  const response = await axios.post("https://mepl-erp.co.in/api/superadmin/changeRole", payload,{
+  const response = await axios.post("https://report-system-ts1c.onrender.com/api/superadmin/changeRole", payload,{
     headers: {Authorization: `Bearer ${token}`},
   });
   console.log(response);

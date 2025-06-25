@@ -17,7 +17,7 @@
 //   const [endDate, setEndDate] = useState(null);
 // const token = localStorage.getItem('token')
 //   const dispatch = useDispatch();
-// const apiUrl= "https://mepl-erp.co.in/superadmin/report/pdf"
+// const apiUrl= "https://report-system-ts1c.onrender.com/superadmin/report/pdf"
 //   // Fetch data from Redux
 //   const { engineers, status, error } = useSelector((state) => state.siteEngineer)
 //   const plazas = useSelector((state) => state.plaza.plazas || []);
@@ -202,7 +202,7 @@ const GenerateReport = () => {
   const [endDate, setEndDate] = useState(null);
   const token = localStorage.getItem('token');
   const dispatch = useDispatch();
-  const apiUrl = "https://mepl-erp.co.in/superadmin/report/pdf";
+  const apiUrl = "https://report-system-ts1c.onrender.com/superadmin/report/pdf";
 
   const { engineers } = useSelector((state) => state.siteEngineer);
   const plazas = useSelector((state) => state.plaza.plazas || []);
