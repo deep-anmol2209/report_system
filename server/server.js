@@ -11,6 +11,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 
+  console.log(dotenvVar.CLIENT_URL);
   
   app.use(
     cors({
