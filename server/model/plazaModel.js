@@ -11,7 +11,7 @@ const plazaSchema = new mongoose.Schema({
   assignedTo: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "SiteEngineer"
+      ref: "User"
     }
 
   ], // Site Engineer  

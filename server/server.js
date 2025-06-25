@@ -12,7 +12,7 @@ app.use(express.json())
 
 const allowedOrigins = [
 
-    "https://mepl-erp.co.in",
+    "https://report-system-phi.vercel.app"
     
   ];
   

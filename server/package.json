@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.13.0",
     "mongoose": "^8.10.1",
+    "nodemailer": "^7.0.3",
     "pdf-master": "^1.1.0",
     "pdfkit": "^0.17.1",
     "pdfkit-table": "^0.1.99",
